@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { FiArrowLeft } from 'react-icons/fi'
 import { Map, TileLayer, Marker } from 'react-leaflet'
 import axios from 'axios'
-import {LeafletMouseEvent} from 'leaflet'
+import { LeafletMouseEvent } from 'leaflet'
 import api from '../../services/api'
 import Dropzone from '../../components/DropZone'
 
@@ -17,12 +17,12 @@ interface Item {
     image_url: string
 }
 
-interface IBGEUFResponse{
-    sigla:string
+interface IBGEUFResponse {
+    sigla: string
 }
 
-interface IBGECityResponse{
-    nome:string
+interface IBGECityResponse {
+    nome: string
 }
 
 const CreatePoint = () => {
@@ -52,15 +52,15 @@ const CreatePoint = () => {
 
     useEffect(() => {
         navigator.geolocation.getCurrentPosition(position => {
-            const {latitude, longitude} = position.coords
+            const { latitude, longitude } = position.coords
 
             setinitialPosition([latitude, longitude])
         }
-            )
+        )
     }, [])
 
     useEffect(() => {
-        axios.get<IBGEUFResponse[]>('https://servicodados.ibge.gov.br/api/v1/localidades/estados').then(res =>{
+        axios.get<IBGEUFResponse[]>('https://servicodados.ibge.gov.br/api/v1/localidades/estados').then(res => {
             const ufInitials = res.data.map(uf => uf.sigla)
 
             setUfs(ufInitials)
@@ -68,11 +68,11 @@ const CreatePoint = () => {
     }, [])
 
     useEffect(() => {
-        if (selectedUf === '0'){
-        return
+        if (selectedUf === '0') {
+            return
         }
 
-        axios.get<IBGECityResponse[]>(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedUf}/municipios`).then(res =>{
+        axios.get<IBGECityResponse[]>(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedUf}/municipios`).then(res => {
             const cityNames = res.data.map(city => city.nome)
 
             setCities(cityNames)
@@ -80,48 +80,48 @@ const CreatePoint = () => {
 
     }, [selectedUf])
 
-    function handleSelectUf(e: ChangeEvent<HTMLSelectElement>){
+    function handleSelectUf(e: ChangeEvent<HTMLSelectElement>) {
         const uf = e.target.value
 
         setselectedUf(uf)
     }
 
-    function handleSelectCity(e: ChangeEvent<HTMLSelectElement>){
+    function handleSelectCity(e: ChangeEvent<HTMLSelectElement>) {
         const city = e.target.value
 
         setselectedCity(city)
     }
 
-    function handleMapClick(e: LeafletMouseEvent){
+    function handleMapClick(e: LeafletMouseEvent) {
         setselectedPosition([
             e.latlng.lat,
             e.latlng.lng
         ])
     }
 
-    function handleInputChange(e: ChangeEvent<HTMLInputElement>){
-        const {name, value} = e.target
+    function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
+        const { name, value } = e.target
 
-        setFormData({...formData, [name]: value})
+        setFormData({ ...formData, [name]: value })
     }
 
-    function handleSelectItem(id: number){
+    function handleSelectItem(id: number) {
         const alreadySelected = selectedItems.findIndex(item => item === id)
 
-        if (alreadySelected >= 0){
+        if (alreadySelected >= 0) {
             const filteredItems = selectedItems.filter(item => item !== id)
             setSelectedItems(filteredItems)
-        } else{
+        } else {
             setSelectedItems([...selectedItems, id])
         }
     }
 
-    async function handleSubmit(e: FormEvent){
+    async function handleSubmit(e: FormEvent) {
         e.preventDefault()
 
 
 
-        const {name, email, whatsapp} = formData
+        const { name, email, whatsapp } = formData
         const uf = selectedUf
         const city = selectedCity
         const [latitude, longitude] = selectedPosition
@@ -137,11 +137,11 @@ const CreatePoint = () => {
         data.append('latitude', String(latitude))
         data.append('longitude', String(longitude))
         data.append('items', items.join(','))
-        
-        if(selectedFile){
+
+        if (selectedFile) {
             data.append('image', selectedFile)
         }
-        
+
         await api.post('points', data)
 
         alert('Ponto de coleta Cadastrado!')
@@ -174,6 +174,7 @@ const CreatePoint = () => {
                             type="text"
                             name="name"
                             id="name"
+                            autoComplete="off"
                             onChange={handleInputChange}
                         />
                     </div>
@@ -185,15 +186,21 @@ const CreatePoint = () => {
                                 type="email"
                                 name="email"
                                 id="email"
+                                autoComplete="off"
+                                placeholder="email@email.com"
                                 onChange={handleInputChange}
                             />
                         </div>
                         <div className="field">
+                            
                             <label htmlFor="whatsapp">Whatsapp</label>
                             <input
                                 type="text"
+                                pattern="\([0-9]{2}\)[\s][0-9]{4}-[0-9]{4,5}"
                                 name="whatsapp"
                                 id="whatsapp"
+                                autoComplete="off"
+                                placeholder="(00) 00000-0000"
                                 onChange={handleInputChange}
                             />
                         </div>
@@ -243,9 +250,9 @@ const CreatePoint = () => {
 
                     <ul className="items-grid">
                         {items.map(item => (
-                            <li key={item.id} 
-                            onClick={ () =>  handleSelectItem(item.id)} 
-                            className = {selectedItems.includes(item.id) ? 'selected' : ''}
+                            <li key={item.id}
+                                onClick={ () => handleSelectItem(item.id)}
+                                className = {selectedItems.includes(item.id) ? 'selected' : ''}
                             >
                                 <img src={item.image_url} alt={item.title} />
                                 <span>{item.title}</span>
