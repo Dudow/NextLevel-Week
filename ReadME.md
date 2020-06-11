@@ -4,5 +4,5 @@
 
 ##### Ecoleta
 
-![Home](./uploads/NextLevel.jpg)
+![Home](https://repository-images.githubusercontent.com/268999287/d6ec6100-a5e9-11ea-92f1-0554ab01acfb)
 
