@@ -4,5 +4,5 @@
 
 ##### Ecoleta
 
-![] (/uploads/NextLevel.jpg)
+![Home](./uploads/NextLevel.jpg)
 
